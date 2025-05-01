@@ -1,0 +1,411 @@
+---
+title: "R Notebook"
+output: html_notebook
+editor_options: 
+  chunk_output_type: inline
+---
+#Load necessary libraries for analyses
+```{r}
+library(ggthemes)
+library(RColorBrewer)
+library(extrafont)
+library(grid)
+library(here)
+library(tidyverse)
+library(ggrepel)
+library(cowplot)
+library(car)
+library(vioplot)
+library(ggplot2)
+library(ggsci)
+library(ggsignif)
+library(tidyverse)
+library(ggstatsplot)
+library(FSA)
+```
+
+```{r}
+setwd("/Users/ashleydye/Documents/THESIS_Calls and Genes Project/Final_data_analysis/")
+frog_calls <- read.csv("final_call_analysis.csv", header=TRUE, sep=",")
+frog_calls
+```
+#Check relationship between call traits and temperature
+```{r}
+#Dominant frequency
+plot(frog_calls$Temperature, frog_calls$Dominant.frequency, xlab="Temperature", ylab="Dominant Frequency")
+abline(lm(frog_calls$Dominant.frequency~frog_calls$Temperature))
+cor.test(frog_calls$Dominant.frequency, frog_calls$Temperature, method = "pearson")
+
+#Pulse rate
+plot(frog_calls$Temperature, frog_calls$Pulse.rate, xlab="Temperature", ylab="Pulse rate")
+abline(lm(frog_calls$Pulse.rate~frog_calls$Temperature))
+cor.test(frog_calls$Pulse.rate, frog_calls$Temperature, method = "pearson")
+
+#Note length
+plot(frog_calls$Temperature, frog_calls$Note.length, xlab="Temperature", ylab="Note length")
+abline(lm(frog_calls$Note.length~frog_calls$Temperature))
+cor.test(frog_calls$Note.length, frog_calls$Temperature, method = "pearson")
+```
+#Regression with Trait and Temp to correct to specific temperature
+```{r}
+lm(data=frog_calls, Dominant.frequency~Temperature)
+
+lm(data=frog_calls, Pulse.rate~Temperature)
+
+lm(data=frog_calls, Note.length~Temperature)
+```
+#Check relationship between call characteristics and SVL (DO AFTER TEMP CORRECTION)
+```{r}
+#Dominant frequency is no longer correlated with SVL
+plot(frog_calls$SVL, frog_calls$DF.TEMP, xlab="SVL", ylab="Dominant frequency")
+abline(lm(frog_calls$DF.TEMP~frog_calls$SVL))
+cor.test(frog_calls$DF.TEMP, frog_calls$SVL, method = "pearson")
+
+#Pulse rate
+plot(frog_calls$SVL, frog_calls$PR.TEMP, xlab="SVL", ylab="Pulse rate")
+abline(lm(frog_calls$PR.TEMP~frog_calls$SVL))
+cor.test(frog_calls$PR.TEMP, frog_calls$SVL, method = "pearson")
+
+#Note length
+plot(frog_calls$SVL, frog_calls$NL.TEMP, xlab="SVL", ylab="Note length")
+abline(lm(frog_calls$NL.TEMP~frog_calls$SVL))
+cor.test(frog_calls$NL.TEMP, frog_calls$SVL, method = "pearson")
+```
+#Make new spreadsheet with SR for analysis
+```{r}
+new_frog_calls <- frog_calls[-c(63,64),]
+new_frog_calls
+```
+#Run Shapiro-Wilkes test for normality in sites and morphs
+```{r}
+#Dominant frequency is NOT normally distributed
+shapiro.test(frog_calls$DF.TEMP[frog_calls$Site=="Achinamisa"])
+shapiro.test(frog_calls$DF.TEMP[frog_calls$Site=="Callanayacu"])
+shapiro.test(frog_calls$DF.TEMP[frog_calls$Site=="Chipesa"])
+shapiro.test(frog_calls$DF.TEMP[frog_calls$Site=="Varadero Striped"])
+shapiro.test(frog_calls$DF.TEMP[frog_calls$Site=="Vaquero"])
+shapiro.test(frog_calls$DF.TEMP[frog_calls$Site=="Red-Headed Varadero"])
+shapiro.test(frog_calls$DF.TEMP[frog_calls$Site=="Chazuta"])
+shapiro.test(frog_calls$DF.TEMP[frog_calls$Site=="San Jose"])
+shapiro.test(frog_calls$DF.TEMP[frog_calls$Site=="Ricardo Palma"])
+
+#Santa Rosa excluded for sample size of 2
+#shapiro.test(frog_calls$DF.TEMPl[frog_calls$Site=="Santa Rosa"])
+
+shapiro.test(frog_calls$DF.TEMP[frog_calls$Morph=="Striped"])
+shapiro.test(frog_calls$DF.TEMP[frog_calls$Morph=="Intermediate"])
+shapiro.test(frog_calls$DF.TEMP[frog_calls$Morph=="Banded"])
+shapiro.test(frog_calls$DF.TEMP[frog_calls$Morph=="Spotted"])
+shapiro.test(frog_calls$DF.TEMP[frog_calls$Morph=="Varadero Red-headed"])
+shapiro.test(frog_calls$DF.TEMP[frog_calls$Morph=="Varadero Striped"])
+```
+```{r}
+#Pulse rate IS NORMALLY DISTRIBUTED
+shapiro.test(frog_calls$PR.TEMP[frog_calls$Site=="Achinamisa"])
+shapiro.test(frog_calls$PR.TEMP[frog_calls$Site=="Callanayacu"])
+shapiro.test(frog_calls$PR.TEMP[frog_calls$Site=="Chipesa"])
+shapiro.test(frog_calls$PR.TEMP[frog_calls$Site=="Varadero Striped"])
+shapiro.test(frog_calls$PR.TEMP[frog_calls$Site=="Vaquero"])
+shapiro.test(frog_calls$PR.TEMP[frog_calls$Site=="Red-Headed Varadero"])
+shapiro.test(frog_calls$PR.TEMP[frog_calls$Site=="Chazuta"])
+shapiro.test(frog_calls$PR.TEMP[frog_calls$Site=="San Jose"])
+shapiro.test(frog_calls$PR.TEMP[frog_calls$Site=="Ricardo Palma"])
+
+#Santa Rosa excluded for sample size of 2
+#shapiro.test(frog_calls$PR.TEMP[frog_calls$Site=="Santa Rosa"])
+
+shapiro.test(frog_calls$PR.TEMP[frog_calls$Morph=="Striped"])
+shapiro.test(frog_calls$PR.TEMP[frog_calls$Morph=="Intermediate"])
+shapiro.test(frog_calls$PR.TEMP[frog_calls$Morph=="Banded"])
+shapiro.test(frog_calls$PR.TEMP[frog_calls$Morph=="Spotted"])
+shapiro.test(frog_calls$PR.TEMP[frog_calls$Morph=="Varadero Red-headed"])
+shapiro.test(frog_calls$PR.TEMP[frog_calls$Morph=="Varadero Striped"])
+
+#shapiro.test(frog_calls$PR.TEMP)
+```
+```{r}
+#Note length is NOT normally distributed
+shapiro.test(frog_calls$NL.TEMP[frog_calls$Site=="Achinamisa"])
+shapiro.test(frog_calls$NL.TEMP[frog_calls$Site=="Callanayacu"])
+shapiro.test(frog_calls$NL.TEMP[frog_calls$Site=="Chipesa"])
+shapiro.test(frog_calls$NL.TEMP[frog_calls$Site=="Varadero Striped"])
+shapiro.test(frog_calls$NL.TEMP[frog_calls$Site=="Vaquero"])
+shapiro.test(frog_calls$NL.TEMP[frog_calls$Site=="Red-Headed Varadero"])
+shapiro.test(frog_calls$NL.TEMP[frog_calls$Site=="Chazuta"])
+shapiro.test(frog_calls$NL.TEMP[frog_calls$Site=="San Jose"])
+shapiro.test(frog_calls$NL.TEMP[frog_calls$Site=="Ricardo Palma"])
+
+#Santa Rosa excluded for sample size of 2
+#shapiro.test(frog_calls$NL.TEMP[frog_calls$Site=="Santa Rosa"])
+
+shapiro.test(frog_calls$NL.TEMP[frog_calls$Morph=="Striped"])
+shapiro.test(frog_calls$NL.TEMP[frog_calls$Morph=="Intermediate"])
+shapiro.test(frog_calls$NL.TEMP[frog_calls$Morph=="Banded"])
+shapiro.test(frog_calls$NL.TEMP[frog_calls$Morph=="Spotted"])
+shapiro.test(frog_calls$NL.TEMP[frog_calls$Morph=="Varadero Red-headed"])
+shapiro.test(frog_calls$NL.TEMP[frog_calls$Morph=="Varadero Striped"])
+```
+#Levene's test of equal variances
+```{r}
+#All data has equal variances
+leveneTest(DF.TEMP~ Morph, data = frog_calls)
+leveneTest(PR.TEMP ~ Morph, data = frog_calls)
+leveneTest(NL.TEMP ~ Morph, data = frog_calls)
+
+leveneTest(DF.TEMP ~ Site, data = frog_calls)
+leveneTest(PR.TEMP ~ Site, data = frog_calls)
+leveneTest(NL.TEMP ~ Site, data = frog_calls)
+```
+#Calculate mean and SD for call traits
+```{r}
+group_mean_df_morph<- aggregate(x= frog_calls$DF.TEMP,
+                      # Specify group indicator
+                      by = list(frog_calls$Morph),      
+                      # Specify function (i.e. mean)
+                      FUN = mean)
+print(group_mean_df_morph)
+
+group_sd_df_morph<- aggregate(x= frog_calls$DF.TEMP,
+                      # Specify group indicator
+                      by = list(frog_calls$Morph),      
+                      # Specify function (i.e. mean)
+                      FUN = sd)
+print(group_sd_df_morph)
+```
+```{r}
+group_mean_pr_morph<- aggregate(x= frog_calls$PR.TEMP,
+                      # Specify group indicator
+                      by = list(frog_calls$Morph),      
+                      # Specify function (i.e. mean)
+                      FUN = mean)
+print(group_mean_pr_morph)
+
+group_sd_pr_morph<- aggregate(x= frog_calls$PR.TEMP,
+                      # Specify group indicator
+                      by = list(frog_calls$Morph),      
+                      # Specify function (i.e. mean)
+                      FUN = sd)
+print(group_sd_pr_morph)
+```
+```{r}
+group_mean_nl_morph<- aggregate(x= frog_calls$NL.TEMP,
+                      # Specify group indicator
+                      by = list(frog_calls$Morph),      
+                      # Specify function (i.e. mean)
+                      FUN = mean)
+print(group_mean_nl_morph)
+
+group_sd_nl_morph<- aggregate(x= frog_calls$NL.TEMP,
+                      # Specify group indicator
+                      by = list(frog_calls$Morph),      
+                      # Specify function (i.e. mean)
+                      FUN = sd)
+print(group_sd_nl_morph)
+```
+#Run Kruskal-Wallis non-parametric test for differences in means for dominant frequency and note length
+```{r}
+#Dominant frequency by morph
+kruskal.test(DF.TEMP ~ Morph, data = frog_calls)
+dunnTest(DF.TEMP ~ Morph, data = frog_calls, method = "bonferroni")
+```
+```{r}
+#Dominant frequency by site
+kruskal.test(DF.TEMP ~ Site, data = new_frog_calls)
+dunnTest(DF.TEMP ~ Site, data = new_frog_calls, method = "bonferroni")
+```
+```{r}
+#Note length by morph
+kruskal.test(NL.TEMP ~ Morph, data = frog_calls)
+dunnTest(NL.TEMP ~ Morph, data = frog_calls, method = "bonferroni")
+```
+```{r}
+#Note length by Site
+kruskal.test(NL.TEMP ~ Site, data = new_frog_calls)
+dunnTest(NL.TEMP ~ Site, data = new_frog_calls, method = "bonferroni")
+```
+#Run ANOVA with TukeyHSD for pulse rate (normally distributed, no difference in variance between groups)
+```{r}
+#Pulse rate by morph
+summary(pr.anova.morph <- aov(frog_calls$PR.TEMP~frog_calls$Morph))
+
+pr.tukey.morph <- TukeyHSD(pr.anova.morph)
+pr.tukey.morph
+```
+```{r}
+#Pulse rate by site
+summary(pr.anova.site <- aov(new_frog_calls$PR.TEMP~new_frog_calls$Site))
+
+pr.tukey.site <- TukeyHSD(pr.anova.site)
+pr.tukey.site
+```
+#Plots
+```{r}
+#Dominant frequency morph
+df_morph <- ggplot(frog_calls, aes(newlabels, DF.TEMP,))
+df<-df_morph +geom_violin(size=2)+ 
+  stat_summary(fun = "mean",
+               geom = "crossbar",
+               width = 0.5,
+               color = "black")+
+  #scale_color_brewer(palette = "Reds", direction = 1)+
+  geom_jitter(cex=5,colour="black",position = position_jitter(seed = 1, width = 0.1)) +
+  labs(
+  x="Color Morph",
+  y="Dominant Frequency\n(Hz)"
+)+theme_classic()+theme(legend.position = "none")  +  scale_x_discrete(limits=c("Spotted","Banded","Intermediate","Striped","Varadero\nStriped", "Varadero\nRed-headed")) + theme(text=element_text(size=40))
+ggsave("df_morph_newlab.png", width =20, height = 9)
+df
+```
+```{r}
+#Note length site
+nl_morph <- ggplot(frog_calls, aes(newlabels, NL.TEMP))
+nl <- nl_morph+geom_violin(size=2)+ 
+  stat_summary(fun = "mean",
+               geom = "crossbar",
+               width = 0.5,
+               color = "black")+
+  #scale_color_brewer(palette="Blues", direction = -1)+
+  labs(
+  x="Color Morph",
+  y="Note Length\n(s)"
+)+theme_classic()+theme(legend.position = "none") + geom_jitter(cex=5,colour="black",position = position_jitter(seed = 1, width = 0.1)) + scale_x_discrete(limits=c("Spotted","Banded","Intermediate","Striped","Varadero\nStriped", "Varadero\nRed-headed")) + theme(text=element_text(size=40))
+ggsave("nl_morph_new.png", width =20, height = 9)
+nl
+```
+```{r}
+frog_calls$newlabels=str_wrap(frog_calls$Morph,width = 9)
+#frog_calls
+#Pulse rate morph
+pr_morph <- ggplot(frog_calls, aes(newlabels, PR.TEMP))
+pr <- pr_morph+geom_violin(size=2)+ 
+  stat_summary(fun = "mean",
+               geom = "crossbar",
+               width = 0.5,
+               color = "black")+
+  #scale_color_brewer(palette = "Reds", direction = 1)+
+  labs(
+  x="Color Morph",
+  y="Pulse Rate\n(pulses/s)"
+)+theme_classic()+theme(legend.position = "none") + geom_jitter(cex=5,colour="black",position = position_jitter(seed = 1, width = 0.1)) + scale_x_discrete(limits=c("Spotted","Banded","Intermediate","Striped","Varadero\nStriped", "Varadero\nRed-headed")) + theme(text=element_text(size=40))
+ggsave("pr_morph_new.png", width =20, height = 9)
+pr
+```
+
+```{r}
+citation()
+version
+```
+##Mantel Tests Attempt
+```{r}
+#install.packages("vegan")
+library(vegan)
+#install.packages("geosphere")
+library(geosphere)
+```
+
+```{r}
+df = read.csv("final_call_analysis.csv", header= TRUE)
+#call trait
+calls = df[,16:ncol(df)]
+freq=df$DF.TEMP
+pulserate=df$PR.TEMP
+notelength=df$NL.TEMP
+
+#environmental vector
+temp = df$Temperature
+
+#longitude and latitude 
+geo = data.frame(df$Latitude, df$Longitude)
+```
+
+```{r}
+#abundance data frame - bray curtis dissimilarity
+dist.call = dist(calls, method = "euclidean")
+dist.df <- dist(freq, method = "euclidean")
+dist.pr <- dist(pulserate, method = "euclidean")
+dist.nl <- dist(notelength, method = "euclidean")
+
+
+#environmental vector - euclidean distance
+dist.temp = dist(temp, method = "euclidean")
+
+#geographic data frame - haversine distance 
+d.geo = distm(geo, fun = distHaversine)
+dist.geo = as.dist(d.geo)
+```
+
+```{r}
+#temp vs call
+call_temp = mantel(dist.call, dist.temp, method = "spearman", permutations = 9999, na.rm = TRUE)
+call_temp
+
+#distance vs call
+call_geo  = mantel(dist.call, dist.geo, method = "spearman", permutations = 9999, na.rm = TRUE)
+call_geo
+
+##Weak positive correlation between call traits and distance r=0.1059,p=0.0128
+```
+
+```{r}
+#df vs geographic 
+df_geo  = mantel(dist.df, dist.geo, method = "spearman", permutations = 10000, na.rm = TRUE)
+df_geo
+
+#pr vs geographic 
+pr_geo  = mantel(dist.pr, dist.geo, method = "spearman", permutations = 100000, na.rm = TRUE)
+pr_geo
+
+#nl vs geographic 
+nl_geo  = mantel(dist.nl, dist.geo, method = "spearman", permutations = 1000000, na.rm = TRUE)
+nl_geo
+```
+
+```{r}
+#install.packages("egg")
+#library(egg)
+multi_figure <- ggarrange(df, pr, nl, labels = c("A","B","C"))
+multi_figure
+```
+
+```{r}
+sessionInfo()
+```
+
+#Plot aifm1 genotypes with dominant frequency
+```{r}
+#new dataframe with aifm1 genotypes and individual ID
+geno <- read.csv("genotypes.csv")
+geno
+
+#join to frog calls datafram
+frog_calls <- left_join(frog_calls, geno, by = "DNA.ID")
+```
+
+
+```{r}
+display.brewer.all(colorblindFriendly = TRUE)
+#plot dominant frequency by genotype
+df_morph <- ggplot(frog_calls, aes(Aifm1_Genotype, DF.TEMP,))
+df<-df_morph +geom_violin(size=2) + 
+  stat_summary(fun = "mean",
+               geom = "crossbar",
+               width = 0.5,
+               color = "black") +
+  geom_point(aes(col=Morph),size=4,position=position_jitter(w=0.1,h=0),show.legend = T) +
+  scale_color_brewer(palette="Paired", direction=-1) +
+  labs(x="Genotype", y="Dominant Frequency\n(Hz)") +
+  theme_classic() +
+  theme(legend.position = "right") + 
+  theme(legend.text=element_text(size=20)) +
+  theme(text=element_text(size=30))
+ggsave("df_geno.png", width =10, height = 7)
+df
+```
+```{r}
+#Dominant frequency by aifm1 genotype
+kruskal.test(DF.TEMP ~ Aifm1_Genotype, data = frog_calls)
+dunnTest(DF.TEMP ~ Aifm1_Genotype, data = frog_calls, method = "bonferroni")
+```
+
+
+
