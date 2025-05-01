@@ -1,0 +1,3 @@
+plink --file input/corrected_2.25.25/geno_data_df --assoc --adjust --out results/corrected_results_2.25.24/corrected_df_2.25.25
+plink --file input/corrected_2.25.25/geno_data_pr --assoc --adjust --out results/corrected_results_2.25.24/corrected_pr_2.25.25
+plink --file input/corrected_2.25.25/geno_data_nl --assoc --adjust --out results/corrected_results_2.25.24/corrected_nl_2.25.25
