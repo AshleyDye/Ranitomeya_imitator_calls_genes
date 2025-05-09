@@ -1,0 +1,9 @@
+# FILE CONVERSION (PED/MAP -> BED/BIM/FAM)
+plink  --file geno_data_df --make-bed --out geno_data_df
+plink  --file geno_data_pr --make-bed --out geno_data_pr
+plink  --file geno_data_nl --make-bed --out geno_data_nl
+
+# RUN ASSOCIATION ANALYSIS
+plink --bfile input/corrected_2.25.25/geno_data_df --assoc --adjust --out results/corrected_results_2.25.24/corrected_df_2.25.25
+plink --bfile input/corrected_2.25.25/geno_data_pr --assoc --adjust --out results/corrected_results_2.25.24/corrected_pr_2.25.25
+plink --bfile input/corrected_2.25.25/geno_data_nl --assoc --adjust --out results/corrected_results_2.25.24/corrected_nl_2.25.25
