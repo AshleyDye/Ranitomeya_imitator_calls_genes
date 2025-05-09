@@ -1,0 +1,4 @@
+Input files for plink association analysis are located in corrected_2.25.25
+  - Input files per call trait: map and ped files for conversion into bed, bim, and fam files, log file of file conversion, txt file of phenotype and genotype data
+Output files plink association analysis are located in corrected_results_2.25.25
+  - Output files per call trait: 1 log file, 1 qassoc file with unadjusted p-values, and 1 qassoc.adjusted file with adjusted p-values
