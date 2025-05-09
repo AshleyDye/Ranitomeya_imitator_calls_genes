@@ -1,3 +1,4 @@
+Code used for file conversion and analysis located under plink code
 Input files for plink association analysis are located in corrected_2.25.25
   - Input files per call trait: map and ped files for conversion into bed, bim, and fam files, log file of file conversion, txt file of phenotype and genotype data
 Output files plink association analysis are located in corrected_results_2.25.25
