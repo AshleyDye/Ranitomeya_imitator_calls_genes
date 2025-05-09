@@ -1,0 +1,28 @@
+PLINK v1.90b7 64-bit (16 Jan 2023)
+Options in effect:
+  --file geno_data_nl
+  --make-bed
+  --out geno_data_nl
+
+Hostname: Ashleys-MacBook-Air-49.local
+Working directory: /Users/ashleydye/Documents/THESIS_Calls and Genes Project/Final_data_analysis/plink_final/input/corrected_2.25.24
+Start time: Tue Feb 25 14:38:39 2025
+
+Random number seed: 1740515919
+16384 MB RAM detected; reserving 8192 MB for main workspace.
+Scanning .ped file... done.
+Performing single-pass .bed write (2 variants, 64 people).
+--file: geno_data_nl-temporary.bed + geno_data_nl-temporary.bim +
+geno_data_nl-temporary.fam written.
+2 variants loaded from .bim file.
+64 people (64 males, 0 females) loaded from .fam.
+64 phenotype values loaded from .fam.
+Using 1 thread (no multithreaded calculations invoked).
+Before main variant filters, 64 founders and 0 nonfounders present.
+Calculating allele frequencies... done.
+Total genotyping rate is exactly 1.
+2 variants and 64 people pass filters and QC.
+Phenotype data is quantitative.
+--make-bed to geno_data_nl.bed + geno_data_nl.bim + geno_data_nl.fam ... done.
+
+End time: Tue Feb 25 14:38:39 2025
