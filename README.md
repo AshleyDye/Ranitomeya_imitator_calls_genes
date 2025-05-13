@@ -1,2 +1,2 @@
 # Ranitomeya imitator acoustic signaling and association analysis
-Code repository for our submitted manuscript.
+Code and data repository for our submitted manuscript.
